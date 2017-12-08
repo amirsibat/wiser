@@ -44,6 +44,9 @@ const productSchema = new mongoose.Schema({
     }
 }, {collection: 'products'});
 
+productSchema.index({price: 1});
+productSchema.index({createdAt: 1});
+
 // Instance methods
 productSchema.methods = {};
 

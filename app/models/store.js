@@ -1,5 +1,6 @@
 import mongoose from 'mongoose'
 import {Product} from './product'
+import * as util from 'util'
 
 const storeSchema = new mongoose.Schema({
     name: {
@@ -19,10 +20,10 @@ const storeSchema = new mongoose.Schema({
     }
 }, {collection: 'stores'});
 
-// Instance methods
-storeSchema.methods = {
+storeSchema.index({createdAt: 1});
 
-};
+// Instance methods
+storeSchema.methods = {};
 
 // Static methods
 storeSchema.statics = {
@@ -39,6 +40,7 @@ storeSchema.statics = {
         let res = [];
         let maxPrice = await Product.find({store_id: id}).sort("-price").limit(1).select("-_id price");
         let minPrice = await Product.find({store_id: id}).sort("price").limit(1).select("-_id price");
+
         if(maxPrice.length > 0){
             res.push(maxPrice[0]["price"]);
         }
@@ -49,7 +51,12 @@ storeSchema.statics = {
         return res;
     },
     getAveragePrice: async function (id) {
-        return null;
+        let prices = await Product.find({store_id: id}).sort("price").select("-_id price");
+        let sum = 0;
+        for (let price of prices) {
+            sum += price.price;
+        }
+        return (sum/prices.length).toFixed(2);
     }
 };
 

@@ -2,7 +2,7 @@ import { IRouterContext } from 'koa-router'
 import { Store } from '../models/store'
 import { Product } from '../models/product'
 import { STORES, PRODUCTS } from '../../utils/constants'
-import {ResourceNotFoundError, StoreMismatchError, BadRequestError} from '../../utils/errors'
+import {ResourceNotFoundError, BadRequestError} from '../../utils/errors'
 
 /**
  * Create Dummy Data
@@ -88,11 +88,12 @@ export async function summary(ctx) {
     for (let store of stores) {
         let productsCount = await Store.getProductsCount(store._id);
         let priceRange = await Store.getPriceRange(store._id);
+        let averagePrice = await Store.getAveragePrice(store._id);
         container[store._id] = {
             store_name: store.name,
             products_count: productsCount,
             price_range: priceRange[1] !== undefined ? priceRange[1] + " - " + priceRange[0] : 'N/A',
-            average_price: priceRange[1] != undefined ? parseInt(priceRange[0])/parseInt(priceRange[1]) : 'N/A'
+            average_price: priceRange[1] != undefined ? averagePrice: 'N/A'
         };
     }
     ctx.body = container;
